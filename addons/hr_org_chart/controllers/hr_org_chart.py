@@ -40,14 +40,20 @@ class HrOrgChartController(http.Controller):
 
         # compute employee data for org chart
         ancestors, current = request.env['hr.employee'], employee
-        while current.parent_id:
-            ancestors += current.parent_id
-            current = current.parent_id
+        mlevel = -1
+       
+        try:
+            while current.parent_id:
+                ancestors += current.parent_id
+                current = current.parent_id
+                mlevel = mlevel + 1
+        except AccessError:
+           print('[VMODEV]: Fixing issue...') 
 
         values = dict(
             self=self._prepare_employee_data(employee),
-            managers=[self._prepare_employee_data(ancestor) for idx, ancestor in enumerate(ancestors) if idx < self._managers_level],
-            managers_more=len(ancestors) > self._managers_level,
+            managers=[self._prepare_employee_data(ancestor) for idx, ancestor in enumerate(ancestors) if idx < mlevel],
+            managers_more=len(ancestors) > mlevel,
             children=[self._prepare_employee_data(child) for child in employee.child_ids],
         )
         values['managers'].reverse()
