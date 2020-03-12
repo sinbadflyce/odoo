@@ -214,7 +214,7 @@ class ResUsers(models.Model):
     def create(self, values):
         # overridden to automatically invite user to sign up
         user = super(ResUsers, self).create(values)
-        if user.email and not self.env.context.get('no_reset_password'):
+        if False: #user.email and not self.env.context.get('no_reset_password'):
             try:
                 user.with_context(create_user=True).action_reset_password()
             except MailDeliveryException:
